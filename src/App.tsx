@@ -1,35 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter,Route, Routes, Link, NavLink } from "react-router-dom";
+import Jobs from "./pages/Jobs";
+import JobDetail from "./pages/JobDetail";
+import Home from "./pages/Home";
 
-function App() {
-  const [count, setCount] = useState(0)
+const Navbar = () => (
+  <header className="navbar">
+    <div className="navbar__inner">
+      <NavLink to="/" className="brand">HireHub</NavLink>
+      <nav>
+        <NavLink to="/jobs" className="nav-link">找工作</NavLink>
+        {/* 预留登录入口 */}
+        <Link to="/login" className="btn-ghost sm">员工登录</Link>
+      </nav>
+    </div>
+  </header>
+);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+const App=()=>{
+  return(
+    <BrowserRouter>
+    <Navbar />
+     <Routes>
+      <Route path="/" element={<Home/>}></Route>
+      <Route path="/jobs" element={<Jobs />}></Route>
+      <Route path="/jobs/:id" element={<JobDetail />}></Route>
+      <Route path="*" element={<div>404 Not Found</div>} />
+     </Routes>
+    </BrowserRouter>
   )
 }
 
-export default App
+export default App;
