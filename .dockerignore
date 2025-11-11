@@ -1,0 +1,23 @@
+# VCS
+.git
+.git/*
+.github
+
+# Node
+node_modules
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist
+build
+
+# OS/IDE
+.DS_Store
+.vscode
+.idea
+
+# Env
+.env
+.env.*
