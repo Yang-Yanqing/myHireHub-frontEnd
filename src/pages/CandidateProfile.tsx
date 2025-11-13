@@ -1,3 +1,4 @@
+// src/pages/CandidateProfile.tsx
 import { useEffect, useState } from "react";
 import http from "../config/api";
 import { useAuth } from "../context/AuthContext";
@@ -43,7 +44,7 @@ const CandidateProfile = () => {
         }
       } catch (err: any) {
         if (!ignore) {
-          setError(err?.response?.data?.message || err.message || "加载失败");
+          setError(err?.response?.data?.message || err.message || "Failed to load");
         }
       } finally {
         if (!ignore) setLoading(false);
@@ -54,23 +55,44 @@ const CandidateProfile = () => {
     };
   }, []);
 
+  const displayInitial =
+    (user?.name || user?.email || "?").trim().charAt(0).toUpperCase();
+
   return (
     <main className="profile">
-      <h1 className="profile__title">候选人中心</h1>
+      <h1 className="profile__title">Candidate portal</h1>
 
       <section className="profile__card">
-        <h2>我的基本信息</h2>
-        <p>姓名：{user?.name ?? "未填写"}</p>
-        <p>邮箱：{user?.email}</p>
+        <h2>Basic information</h2>
+        <div className="profile__user">
+          {user?.photoUrl ? (
+            <img
+              src={user.photoUrl}
+              alt={user.name || user.email}
+              className="profile__avatar"
+            />
+          ) : (
+            <div className="profile__avatar profile__avatar--fallback">
+              {displayInitial}
+            </div>
+          )}
+          <div className="profile__user-info">
+            <p>Full name: {user?.name ?? "Not provided"}</p>
+            <p>Email: {user?.email}</p>
+            <p>Role: {user?.role ?? "Unknown"}</p>
+          </div>
+        </div>
       </section>
 
       <section className="profile__card">
-        <h2>我的投递</h2>
-        {loading && <div>加载中...</div>}
+        <h2>My applications</h2>
+        {loading && <div>Loading applications...</div>}
         {error && <div className="profile__error">{error}</div>}
 
         {!loading && !error && applications.length === 0 && (
-          <div className="profile__empty">当前还没有任何投递。</div>
+          <div className="profile__empty">
+            You have not applied to any jobs yet.
+          </div>
         )}
 
         {!loading && !error && applications.length > 0 && (
@@ -79,9 +101,7 @@ const CandidateProfile = () => {
               <li key={app.id} className="profile__item">
                 <div className="profile__item-main">
                   <div>
-                    <div className="profile__job-title">
-                      {app.job.title}
-                    </div>
+                    <div className="profile__job-title">{app.job.title}</div>
                     <div className="profile__job-meta">
                       <span>{app.job.company ?? "—"}</span>
                       <span className="dot">·</span>
@@ -89,11 +109,11 @@ const CandidateProfile = () => {
                     </div>
                   </div>
                   <div className="profile__status">
-                    状态：{app.status}
+                    Status: {app.status}
                   </div>
                 </div>
                 <div className="profile__item-sub">
-                  投递时间：{new Date(app.createdAt).toLocaleString()}
+                  Applied at: {new Date(app.createdAt).toLocaleString()}
                 </div>
               </li>
             ))}

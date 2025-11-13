@@ -40,7 +40,3 @@ http.interceptors.request.use(( config:InternalAxiosRequestConfig )=>{
 });
 
 export default http;
-
-
-
-

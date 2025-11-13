@@ -20,7 +20,8 @@ interface AuthContextValue {
   registerCandidate: (
     email: string,
     password: string,
-    name?: string
+    name?: string,
+    photoUrl?: string
   ) => Promise<AuthUser>;
   logout: () => void;
 }
@@ -48,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(false);
   }, []);
 
-   async function login(email: string, password: string): Promise<AuthUser> {
+  async function login(email: string, password: string): Promise<AuthUser> {
     try {
       const res = await http.post("/auth/login", { email, password });
       const data = res.data;
@@ -69,16 +70,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
-  
   async function registerCandidate(
     email: string,
     password: string,
-    name?: string
+    name?: string,
+    photoUrl?: string
   ): Promise<AuthUser> {
     try {
-      // 注意：这里的路径要跟你后端 routes 对上
-      // 如果后端是 router.post("/register-candidate") 就改成 "/auth/register-candidate"
-      const res = await http.post("/auth/register", { email, password, name });
+      const res = await http.post("/auth/register", {
+        email,
+        password,
+        name,
+        photoUrl: photoUrl || undefined,
+      });
       const data = res.data;
 
       const authUser = data.user as AuthUser;
