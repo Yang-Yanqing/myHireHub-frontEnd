@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-
+import http from "../config/api";
 type Role = "HR" | "LEAD" | "CANDIDATE";
 
 export interface AuthUser {
@@ -47,37 +47,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(false);
   }, []);
 
-  async function login(email: string, password: string) {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    if (!res.ok) throw new Error("Login failed");
-    const data = await res.json();
-    setToken(data.token);
-    setUser(data.user);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-  }
+  async function login(email:string, password:string) {
+  const res = await http.post("/auth/login", {email,password});
+  const data = res.data;
+
+  setToken(data.token);
+  setUser(data.user);
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(data.user));
+}
 
   async function registerCandidate(
-    email: string,
-    password: string,
-    name?: string
-  ) {
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name }),
-    });
-    if (!res.ok) throw new Error("Register failed");
-    const data = await res.json();
-    setToken(data.token);
-    setUser(data.user);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-  }
+  email: string,
+  password: string,
+  name?: string
+) {
+  const res = await http.post("/auth/register", {
+    email,
+    password,
+    name,
+  });
+  const data = res.data;
+
+  setToken(data.token);
+  setUser(data.user);
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(data.user));
+}
 
   function logout() {
     setUser(null);
