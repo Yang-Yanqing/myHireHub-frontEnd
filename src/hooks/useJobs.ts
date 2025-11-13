@@ -8,8 +8,8 @@ export interface Job{
   id:number;
   externalId:string;
   title:string;
-  company?:string;
-  location?:string;
+  company:string;
+  location:string;
   type?:string;
   description?:string;
   url?:string;
@@ -34,7 +34,7 @@ const useJobs=(published=true):{
             try {
                 setLoading(true);
                 //No published no brodacast
-                const res=await http.get("/jobs", {params:{published}});
+                const res=await http.get("/jobs");
                 const data=res.data?.data??res.data??[];
                 //Array is easy to handle
                 if (!ignore) setJobs(Array.isArray(data)?data:[]);

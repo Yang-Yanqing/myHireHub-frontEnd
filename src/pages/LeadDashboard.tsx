@@ -11,7 +11,7 @@ type ApplicationStatus =
 
 interface LeadCandidate {
   id: number;
-  name?: string | null;
+  fullName?: string | null;
   email: string;
 }
 
@@ -99,7 +99,7 @@ const LeadDashboard = () => {
               <tr key={app.id}>
                 <td>{app.job.title}</td>
                 <td>
-                  {app.candidate.name || "未填写"} ({app.candidate.email})
+                  {app.candidate.fullName||"未填写"} ({app.candidate.email})
                 </td>
                 <td>{app.status}</td>
                 <td>{new Date(app.createdAt).toLocaleString()}</td>

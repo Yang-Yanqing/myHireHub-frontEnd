@@ -1,3 +1,4 @@
+// src/pages/Login.tsx
 import { type FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -21,10 +22,23 @@ const Login = () => {
     setError(null);
     setLoading(true);
     try {
-      await login(loginEmail, loginPassword);
-      navigate("/jobs");
+      const authUser = await login(loginEmail, loginPassword);
+
+      // ✅ 按角色跳转
+      if (authUser.role === "HR") {
+        navigate("/dash/hr");
+      } else if (authUser.role === "LEAD") {
+        navigate("/dash/lead");
+      } else {
+        // CANDIDATE 或其他角色
+        navigate("/jobs");
+      }
     } catch (err: any) {
-      setError(err?.response?.data?.error || err.message || "登录失败");
+      setError(
+        err?.message ||
+          err?.response?.data?.error ||
+          "登录失败"
+      );
     } finally {
       setLoading(false);
     }
@@ -35,17 +49,22 @@ const Login = () => {
     setError(null);
     setLoading(true);
     try {
-      await registerCandidate(
-         regEmail,
-       regPassword,
-         regName,
+      const authUser = await registerCandidate(
+        regEmail,
+        regPassword,
+        regName,
       );
-      navigate("/jobs");
+      // ✅ 注册候选人后直接去“我的投递”或职位页
+      if (authUser.role === "CANDIDATE") {
+        navigate("/profile");
+      } else {
+        navigate("/jobs");
+      }
     } catch (err: any) {
       setError(
-        err?.response?.data?.error ||
+        err?.message ||
+          err?.response?.data?.error ||
           err?.response?.data?.message ||
-          err.message ||
           "注册失败"
       );
     } finally {

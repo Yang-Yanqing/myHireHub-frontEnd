@@ -1,3 +1,4 @@
+// src/context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import http from "../config/api";
 
@@ -47,8 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(false);
   }, []);
 
-  // ✅ 用 axios 实例 http，而不是 fetch
-  async function login(email: string, password: string): Promise<AuthUser> {
+   async function login(email: string, password: string): Promise<AuthUser> {
     try {
       const res = await http.post("/auth/login", { email, password });
       const data = res.data;
@@ -60,7 +60,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem("user", JSON.stringify(authUser));
       return authUser;
     } catch (err: any) {
-      // 让页面那边统一处理 err.message
       const msg =
         err?.response?.data?.error ||
         err?.response?.data?.message ||
@@ -70,12 +69,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
+  
   async function registerCandidate(
     email: string,
     password: string,
     name?: string
   ): Promise<AuthUser> {
     try {
+      // 注意：这里的路径要跟你后端 routes 对上
+      // 如果后端是 router.post("/register-candidate") 就改成 "/auth/register-candidate"
       const res = await http.post("/auth/register", { email, password, name });
       const data = res.data;
 
@@ -122,4 +124,4 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return ctx;
-}
+};

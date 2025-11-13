@@ -10,9 +10,9 @@ type ApplicationStatus =
   | "REJECTED";
 
 interface HrCandidate {
-  id: number;
-  name?: string | null;
-  email: string;
+  id:number;
+  fullName?:string|null;
+  email:string;
 }
 
 interface HrJob {
@@ -100,7 +100,7 @@ const HrDashboard = () => {
               <tr key={app.id}>
                 <td>{app.job.title}</td>
                 <td>
-                  {app.candidate.name || "未填写"} ({app.candidate.email})
+                  {app.candidate.fullName || "未填写"} ({app.candidate.email})
                 </td>
                 <td>{app.status}</td>
                 <td>{new Date(app.createdAt).toLocaleString()}</td>
