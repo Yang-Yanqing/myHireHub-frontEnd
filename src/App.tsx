@@ -52,8 +52,8 @@ const App=()=>{
       <Route path="/" element={<Home/>}></Route>
       <Route path="/jobs" element={<Jobs />}></Route>
       <Route path="/jobs/:id" element={<JobDetail />}></Route>
-      <Route path="/login" element={<Login />} />
-      <Route path="*" element={<div>404 Not Found</div>} />
+      <Route path="/login" element={<Login />} ></Route>
+      <Route path="*" element={<div>404 Not Found</div>} ></Route>
      </Routes>
     </BrowserRouter>
   )
