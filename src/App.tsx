@@ -1,4 +1,4 @@
-import { BrowserRouter,Route, Routes, Link, NavLink } from "react-router-dom";
+import { Route, Routes, Link, NavLink } from "react-router-dom";
 import {useAuth} from "./context/AuthContext"
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
@@ -46,7 +46,7 @@ const Navbar = () => {
 
 const App=()=>{
   return(
-    <BrowserRouter>
+    <>
     <Navbar />
      <Routes>
       <Route path="/" element={<Home/>}></Route>
@@ -55,7 +55,8 @@ const App=()=>{
       <Route path="/login" element={<Login />} ></Route>
       <Route path="*" element={<div>404 Not Found</div>} ></Route>
      </Routes>
-    </BrowserRouter>
+     </>
+
   )
 }
 

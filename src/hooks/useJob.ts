@@ -33,5 +33,5 @@ const useJob=(id:string):{
 
 
 
-export default useJob
+export default useJob;
 

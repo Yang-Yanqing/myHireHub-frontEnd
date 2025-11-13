@@ -51,4 +51,4 @@ const useJobs=(published=true):{
 return {jobs,loading,error}    
 }
 
-export default useJobs
+export default useJobs;
