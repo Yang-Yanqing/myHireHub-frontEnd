@@ -1,3 +1,4 @@
+// src/pages/LeadDashboard.tsx
 import { useEffect, useState } from "react";
 import http from "../config/api";
 
@@ -13,6 +14,7 @@ interface LeadCandidate {
   id: number;
   fullName?: string | null;
   email: string;
+  photoUrl?: string | null;
 }
 
 interface LeadJob {
@@ -42,7 +44,7 @@ const LeadDashboard = () => {
       const data = res.data?.data ?? res.data ?? [];
       setApplications(Array.isArray(data) ? data : []);
     } catch (err: any) {
-      setError(err?.response?.data?.message || err.message || "加载失败");
+      setError(err?.response?.data?.message || err.message || "Failed to load");
     } finally {
       setLoading(false);
     }
@@ -56,6 +58,7 @@ const LeadDashboard = () => {
     try {
       setUpdatingId(id);
       await http.patch(`/applications/${id}/status`, { status });
+
       setApplications((prev) =>
         prev.map((app) =>
           app.id === id ? { ...app, status } : app
@@ -65,72 +68,102 @@ const LeadDashboard = () => {
       alert(
         err?.response?.data?.message ||
           err.message ||
-          "更新状态失败"
+          "Failed to update status"
       );
     } finally {
       setUpdatingId(null);
     }
   }
 
+
+  const visibleApps = applications.filter(
+    (app) => app.status === "INTERVIEW"
+  );
+
   return (
     <main className="dash">
       <h1 className="dash__title">Lead Dashboard</h1>
 
-      {loading && <div>加载中...</div>}
+      {loading && <div>Loading...</div>}
       {error && <div className="dash__error">{error}</div>}
 
-      {!loading && !error && applications.length === 0 && (
-        <div className="dash__empty">暂时还没有审批中的候选人。</div>
+      {!loading && !error && visibleApps.length === 0 && (
+        <div className="dash__empty">
+          There are no applications waiting for Lead review.
+        </div>
       )}
 
-      {!loading && !error && applications.length > 0 && (
+      {!loading && !error && visibleApps.length > 0 && (
         <table className="dash__table">
           <thead>
             <tr>
-              <th>职位</th>
-              <th>候选人</th>
-              <th>当前状态</th>
-              <th>投递时间</th>
-              <th>审批操作</th>
+              <th>Job</th>
+              <th>Avatar</th>
+              <th>Candidate</th>
+              <th>Current status</th>
+              <th>Applied at</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {applications.map((app) => (
-              <tr key={app.id}>
-                <td>{app.job.title}</td>
-                <td>
-                  {app.candidate.fullName||"未填写"} ({app.candidate.email})
-                </td>
-                <td>{app.status}</td>
-                <td>{new Date(app.createdAt).toLocaleString()}</td>
-                <td>
-                  <button
-                    type="button"
-                    className="btn-ghost sm"
-                    disabled={updatingId === app.id}
-                    onClick={() => updateStatus(app.id, "OFFER")}
-                  >
-                    发 Offer
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-ghost sm"
-                    disabled={updatingId === app.id}
-                    onClick={() => updateStatus(app.id, "REJECTED")}
-                  >
-                    拒绝
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-ghost sm"
-                    disabled={updatingId === app.id}
-                    onClick={() => updateStatus(app.id, "SCREENING")}
-                  >
-                    打回初筛
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {visibleApps.map((app) => {
+              const candidate = app.candidate;
+              const displayInitial =
+                (candidate.fullName || candidate.email || "?")
+                  .trim()
+                  .charAt(0)
+                  .toUpperCase();
+
+              return (
+                <tr key={app.id}>
+                  <td>{app.job.title}</td>
+                  <td>
+                    {candidate.photoUrl ? (
+                      <img
+                        src={candidate.photoUrl}
+                        alt={candidate.fullName || candidate.email}
+                        className="table-avatar"
+                      />
+                    ) : (
+                      <div className="table-avatar table-avatar--fallback">
+                        {displayInitial}
+                      </div>
+                    )}
+                  </td>
+                  <td>
+                    {candidate.fullName || "Unnamed"} ({candidate.email})
+                  </td>
+                  <td>{app.status}</td>
+                  <td>{new Date(app.createdAt).toLocaleString()}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn-ghost sm"
+                      disabled={updatingId === app.id}
+                      onClick={() => updateStatus(app.id, "OFFER")}
+                    >
+                      Send offer
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-ghost sm"
+                      disabled={updatingId === app.id}
+                      onClick={() => updateStatus(app.id, "REJECTED")}
+                    >
+                      Reject
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-ghost sm"
+                      disabled={updatingId === app.id}
+                      onClick={() => updateStatus(app.id, "SCREENING")}
+                    >
+                      Send back to HR
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

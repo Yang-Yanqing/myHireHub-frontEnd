@@ -8,7 +8,7 @@ body{
   font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
-/* ===== Tiger Tail Palette (remap原有pop变量以最小改动) ===== */
+/* ===== Tiger Tail Palette ===== */
 :root{
   /* Tiger Tail core */
   --tt-cream:  #F2EEB6;  /* 1 */
@@ -17,10 +17,10 @@ body{
   --tt-umber:  #BF6F41;  /* 4 */
   --tt-ink:    #231919;  /* 5 */
 
-  /* 兼容现有变量名：全部映射到新色系 */
+  /* 兼容原 pop 变量 */
   --pop-red:   var(--tt-orange);
   --pop-yellow:var(--tt-sun);
-  --pop-blue:  var(--tt-umber);   /* 用赭色替代蓝 */
+  --pop-blue:  var(--tt-umber);
   --pop-cyan:  var(--tt-sun);
   --pop-purple:var(--tt-umber);
   --pop-pink:  var(--tt-orange);
@@ -29,7 +29,7 @@ body{
   --pop-white: #ffffff;
 
   --radius: 20px;
-  --shadow: 0 12px 30px rgba(35,25,25,.14); /* 温暖的阴影 */
+  --shadow: 0 12px 30px rgba(35,25,25,.14); /* warm shadow */
 }
 
 /* Links & Utilities */
@@ -62,7 +62,7 @@ a:hover { opacity:.85; }
 /* ===== Navbar ===== */
 .navbar{
   position:sticky; top:0; z-index:50; backdrop-filter: blur(6px);
-  background: rgba(242,238,182,0.78); /* 半透明奶油色 */
+  background: rgba(242,238,182,0.78); /* semi-transparent cream */
   border-bottom:1px solid rgba(35,25,25,.08);
 }
 .navbar__inner{
@@ -76,10 +76,18 @@ a:hover { opacity:.85; }
 }
 .nav-link{ margin-right:12px; font-weight:700; }
 
-/* NEW: avatar in navbar */
-.nav-avatar-btn{ border:none; background:transparent; cursor:pointer; padding:0; margin-right:.75rem; display:inline-flex; align-items:center; justify-content:center; }
+/* ==== avatar in navbar（放大版） ==== */
+.nav-avatar-btn{
+  border:none; background:transparent; cursor:pointer;
+  padding:0; margin-right:.75rem;
+  display:inline-flex; align-items:center; justify-content:center;
+}
 .nav-avatar-img,.nav-avatar-fallback{
-  width:32px; height:32px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-size:14px; font-weight:600;
+  width:44px;               /* 原来 32 → 现在更醒目 */
+  height:44px;
+  border-radius:999px;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:600;
 }
 .nav-avatar-img{ object-fit:cover; }
 .nav-avatar-fallback{ background: var(--tt-umber); color:#fff; }
@@ -88,7 +96,7 @@ a:hover { opacity:.85; }
 .home{ scroll-snap-type:y mandatory; overflow-y:auto; height: calc(100dvh - 64px); }
 .snap{ scroll-snap-align:start; min-height: calc(100dvh - 64px); display:grid; place-items:center; padding:24px; }
 
-/* Hero（更简约的“壁画”背景） */
+/* Hero */
 .hero{
   position:relative;
   background:
@@ -104,7 +112,7 @@ a:hover { opacity:.85; }
 .hero__subtitle{ font-size: clamp(16px, 2.5vw, 22px); margin:0 0 24px; }
 .hero__cta{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
 
-/* hero pixel pattern：改为更稀疏更轻 */
+/* hero 背景 grid（保留轻微像素感） */
 .hero__pattern{
   position:absolute; inset:0; z-index:-1; opacity:.10;
   background-image:
@@ -138,7 +146,7 @@ a:hover { opacity:.85; }
 }
 .section-cta{ margin-top:10px; }
 
-/* Confetti：改为更大颗粒、更轻密度 */
+/* Confetti：第二页稍微飘一点点 */
 .confetti{
   position:absolute; inset:0; pointer-events:none; opacity:.18;
   background-image:
@@ -154,36 +162,46 @@ a:hover { opacity:.85; }
   to{   background-position: 0 900px, 24px 930px, 48px 915px; }
 }
 
-/* Features 2 (alt)：弱化粉色晕染，改为暖黄晕染 */
+/* ===== Features 2 (Home 第三页) ===== */
+/* 背景用 Mondrian 风格：粗线 + 大色块，不要波点 */
 .features.alt{
-  background:
-    radial-gradient(24px 24px at 10% 10%, rgba(242,212,61,.16) 40%, transparent 41%) repeat,
-    linear-gradient(180deg, #fff, #FAF6E2);
-  background-size: 64px 64px, auto;
+  background: linear-gradient(180deg, #fff, #FAF6E2);
 }
+
+/* ★★★ 关键：去掉原来的“波点 squares”，改成格子线风格 ★★★ */
+.squares{
+  position:absolute; inset:0; z-index:-1;
+  background-color:#FAF6E2;
+  /* 粗黑横线 */
+  background-image:
+    linear-gradient(#231919 6px, transparent 6px),
+    linear-gradient(90deg,#231919 6px, transparent 6px),
+    /* 黄色大块 */
+    linear-gradient(to right, var(--tt-sun) 0 35%, transparent 35%),
+    /* 橙色小块 */
+    linear-gradient(to bottom, var(--tt-orange) 0 30%, transparent 30%);
+  background-size:
+    100% 140px,   /* 横线间距 */
+    140px 100%,   /* 竖线间距 */
+    40% 40%,      /* 黄块尺寸 */
+    18% 35%;      /* 橙块尺寸 */
+  background-position:
+    0 0,
+    0 0,
+    right bottom,
+    left 55%;
+  background-repeat: repeat, repeat, no-repeat, no-repeat;
+  opacity:0.95;
+}
+
 .cards{
   display:grid; gap:18px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   margin:10px 0 6px;
 }
 .card{
   background:#fff; border-radius:16px; padding:16px; box-shadow: var(--shadow);
-  border:4px solid transparent;
-  background-image:
-    linear-gradient(#fff,#fff),
-    linear-gradient(135deg,var(--tt-sun),var(--tt-umber));
-  background-origin: border-box; background-clip: padding-box, border-box;
-}
-
-/* squares background：线更淡，点用黄橙 */
-.squares{
-  position:absolute; inset:0; z-index:-1; opacity:.14;
-  background:
-    linear-gradient(90deg, rgba(35,25,25,.05) 1px, transparent 1px),
-    linear-gradient(0deg,  rgba(35,25,25,.05) 1px, transparent 1px),
-    radial-gradient(circle at 25% 30%, var(--tt-sun) 2px, transparent 3px),
-    radial-gradient(circle at 55% 70%, var(--tt-orange) 2px, transparent 3px),
-    radial-gradient(circle at 80% 40%, var(--tt-umber) 2px, transparent 3px);
-  background-size: 42px 42px, 42px 42px, 90px 90px, 110px 110px, 100px 100px;
+  border:4px solid var(--tt-ink);                       /* 粗黑边框呼应蒙德里安 */
+  border-radius: 0;                                     /* 更硬一点 */
 }
 
 /* ===== Jobs / JobDetail ===== */
@@ -257,7 +275,7 @@ a:hover { opacity:.85; }
 .job-detail__error{ color:#b00020; font-size:14px; }
 .job-detail__success{ color:#0a7b3f; font-size:14px; }
 
-/* ===== Auth ===== */
+/* ===== Auth (Login / Register) ===== */
 .auth{ min-height: calc(100dvh - 64px); display:flex; align-items:center; justify-content:center; padding:24px 16px; }
 .auth__card{ width:100%; max-width:480px; background:#fff; border-radius:var(--radius); box-shadow: var(--shadow); padding:24px 22px; }
 .auth__title{ margin:0 0 12px; font-size:24px; font-weight:800; }
@@ -267,7 +285,7 @@ a:hover { opacity:.85; }
 .auth__error{ margin-bottom:8px; padding:8px 10px; border-radius:8px; background:#FFECEC; color:#b00020; font-size:14px; }
 .auth__hint{ margin-top:12px; font-size:14px; opacity:.8; }
 
-/* NEW: role selector in Register */
+/* Register 角色选择 */
 .auth__role-group{ margin-bottom:1rem; border:1px solid #e8dfc6; padding:.75rem 1rem; border-radius:.75rem; background:#fff; }
 .auth__role-group legend{ font-size:13px; opacity:.8; }
 .auth__role-option{ display:flex; align-items:center; gap:.5rem; margin-top:.25rem; font-size:14px; }
@@ -277,12 +295,22 @@ a:hover { opacity:.85; }
 .profile{ max-width:960px; margin:16px auto; padding:0 16px 32px; }
 .profile__title{ margin:0 0 12px; font-size:26px; font-weight:800; }
 .profile__card{ background:#fff; border-radius:var(--radius); padding:16px 18px; box-shadow: var(--shadow); margin-bottom:16px; }
+
 .profile__user{ display:flex; align-items:center; gap:1rem; }
-.profile__avatar{ width:64px; height:64px; border-radius:999px; object-fit:cover; }
+/* ★ 头像放大到 80px */
+.profile__avatar{
+  width:80px;
+  height:80px;
+  border-radius:999px;
+  object-fit:cover;
+}
 .profile__avatar--fallback{
-  background: var(--tt-umber); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:24px;
+  background: var(--tt-umber); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:600; font-size:26px;
 }
 .profile__user-info p{ margin:2px 0; font-size:14px; }
+
 .profile__error{ color:#b00020; font-size:14px; }
 .profile__empty{ font-size:14px; opacity:.8; }
 .profile__list{ list-style:none; margin:0; padding:0; }
@@ -295,7 +323,7 @@ a:hover { opacity:.85; }
 .profile__item-sub{ margin-top:4px; font-size:12px; opacity:.8; }
 .dot{ margin:0 4px; opacity:.5; }
 
-/* ===== Dashboards ===== */
+/* ===== HR / Lead Dashboards ===== */
 .dash{ max-width:1080px; margin:16px auto; padding:0 16px 32px; }
 .dash__title{ margin:0 0 12px; font-size:24px; font-weight:800; }
 .dash__error{ color:#b00020; font-size:14px; margin-bottom:8px; }
@@ -306,6 +334,26 @@ a:hover { opacity:.85; }
 .dash__table th, .dash__table td{ padding:10px 12px; border-bottom:1px solid #f0e8cf; }
 .dash__table th{ text-align:left; background:#FBF6DD; }
 .dash__table tr:last-child td{ border-bottom:none; }
+
+/* ★ HR / Lead 表格里的头像 */
+.table-avatar{
+  width:40px;
+  height:40px;
+  border-radius:999px;
+  object-fit:cover;
+}
+.table-avatar--fallback{
+  background:#231919;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:600;
+}
 
 /* ===== Small screen tweaks ===== */
 @media (max-width: 640px){
