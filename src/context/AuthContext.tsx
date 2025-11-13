@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import http from "../config/api";
-type Role = "HR" | "LEAD" | "CANDIDATE";
+
+export type Role = "HR" | "LEAD" | "CANDIDATE";
 
 export interface AuthUser {
   id: number;
@@ -14,12 +15,12 @@ interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthUser>;
   registerCandidate: (
     email: string,
     password: string,
     name?: string
-  ) => Promise<void>;
+  ) => Promise<AuthUser>;
   logout: () => void;
 }
 
@@ -31,7 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -47,33 +47,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(false);
   }, []);
 
-  async function login(email:string, password:string) {
-  const res = await http.post("/auth/login", {email,password});
-  const data = res.data;
+  // ✅ 用 axios 实例 http，而不是 fetch
+  async function login(email: string, password: string): Promise<AuthUser> {
+    try {
+      const res = await http.post("/auth/login", { email, password });
+      const data = res.data;
 
-  setToken(data.token);
-  setUser(data.user);
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
-}
+      const authUser = data.user as AuthUser;
+      setToken(data.token);
+      setUser(authUser);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(authUser));
+      return authUser;
+    } catch (err: any) {
+      // 让页面那边统一处理 err.message
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        err.message ||
+        "Login failed";
+      throw new Error(msg);
+    }
+  }
 
   async function registerCandidate(
-  email: string,
-  password: string,
-  name?: string
-) {
-  const res = await http.post("/auth/register", {
-    email,
-    password,
-    name,
-  });
-  const data = res.data;
+    email: string,
+    password: string,
+    name?: string
+  ): Promise<AuthUser> {
+    try {
+      const res = await http.post("/auth/register", { email, password, name });
+      const data = res.data;
 
-  setToken(data.token);
-  setUser(data.user);
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
-}
+      const authUser = data.user as AuthUser;
+      setToken(data.token);
+      setUser(authUser);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(authUser));
+      return authUser;
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        err.message ||
+        "Register failed";
+      throw new Error(msg);
+    }
+  }
 
   function logout() {
     setUser(null);
@@ -91,7 +111,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     logout,
   };
 
-
   return (
     <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
   );
@@ -103,4 +122,4 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return ctx;
-};
+}
