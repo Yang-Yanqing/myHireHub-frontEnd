@@ -1,9 +1,15 @@
+// src/App.tsx
 import { Route, Routes, Link, NavLink } from "react-router-dom";
-import {useAuth} from "./context/AuthContext"
+import { useAuth } from "./context/AuthContext";
+
+import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
-import Home from "./pages/Home";
 import Login from "./pages/Login";
+import CandidateProfile from "./pages/CandidateProfile";
+import HrDashboard from "./pages/HrDashboard";
+import LeadDashboard from "./pages/LeadDashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -18,6 +24,24 @@ const Navbar = () => {
           <NavLink to="/jobs" className="nav-link">
             找工作
           </NavLink>
+
+          {user && user.role === "CANDIDATE" && (
+            <NavLink to="/profile" className="nav-link">
+              我的投递
+            </NavLink>
+          )}
+
+          {user && user.role === "HR" && (
+            <NavLink to="/dash/hr" className="nav-link">
+              HR 面板
+            </NavLink>
+          )}
+
+          {user && user.role === "LEAD" && (
+            <NavLink to="/dash/lead" className="nav-link">
+              Lead 面板
+            </NavLink>
+          )}
 
           {user ? (
             <>
@@ -43,21 +67,49 @@ const Navbar = () => {
   );
 };
 
-
-const App=()=>{
-  return(
+const App = () => {
+  return (
     <>
-    <Navbar />
-     <Routes>
-      <Route path="/" element={<Home/>}></Route>
-      <Route path="/jobs" element={<Jobs />}></Route>
-      <Route path="/jobs/:id" element={<JobDetail />}></Route>
-      <Route path="/login" element={<Login />} ></Route>
-      <Route path="*" element={<div>404 Not Found</div>} ></Route>
-     </Routes>
-     </>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/jobs/:id" element={<JobDetail />} />
+        <Route path="/login" element={<Login />} />
 
-  )
-}
+     
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute roles={["CANDIDATE"]}>
+              <CandidateProfile />
+            </ProtectedRoute>
+          }
+        />
+
+      
+        <Route
+          path="/dash/hr"
+          element={
+            <ProtectedRoute roles={["HR"]}>
+              <HrDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dash/lead"
+          element={
+            <ProtectedRoute roles={["LEAD"]}>
+              <LeadDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<div>404 Not Found</div>} />
+      </Routes>
+    </>
+  );
+};
 
 export default App;
