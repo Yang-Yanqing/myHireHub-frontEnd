@@ -5,7 +5,7 @@ import http from "../config/api";
 
 
 export interface Job{
-  id:string;
+  id:number;
   externalId:string;
   title:string;
   company?:string;
