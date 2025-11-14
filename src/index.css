@@ -1022,7 +1022,7 @@ main > div:only-child {
 }
 
 
-/* 小屏：文案和图片上下排 */
+
 @media (max-width: 900px) {
   .features__layout {
     grid-template-columns: minmax(0, 1fr);
