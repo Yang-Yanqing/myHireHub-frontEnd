@@ -8,14 +8,14 @@ const Home = () => {
         <div className="hero__content pop-card">
           <h1 className="hero__title">HireHub</h1>
           <p className="hero__subtitle">
-            Minimal ATS • 快速上手 • 流畅流程
+            Minimal ATS • Quick to Start • Seamless Workflow
           </p>
           <div className="hero__cta">
             <Link to="/jobs" className="btn-pop">
-              开始找工作
+              Find Job Now
             </Link>
             <a href="#p2" className="btn-ghost">
-              看看亮点
+              See the Highlights
             </a>
           </div>
         </div>
