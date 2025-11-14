@@ -1009,6 +1009,19 @@ main > div:only-child {
   line-height: 1.4;
 }
 
+
+.feature-image-card {
+  max-width: 280px;      
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.feature-image {
+  width: 100%;
+  height: auto;
+}
+
+
 /* 小屏：文案和图片上下排 */
 @media (max-width: 900px) {
   .features__layout {
