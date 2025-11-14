@@ -1,10 +1,968 @@
-/* =========================
-   Home Features: text + images layout
-   只影响首页第二、三页的布局，不改全局风格
+/* ========================= 
+   0. Color Vars & Reset
    ========================= */
 
-/* 让 Why HireHub / 三页式 这两块的 h2 占满一行，
-   真正的左右两列由 .features__layout 控制 */
+:root {
+  --tt-bg: #F2EEB6;        /* Tiger-Tail-1 */
+  --tt-yellow: #F2D43D;    /* Tiger-Tail-2 */
+  --tt-orange: #F2A922;    /* Tiger-Tail-3 */
+  --tt-brown: #BF6F41;     /* Tiger-Tail-4 */
+  --tt-ink: #231919;       /* Tiger-Tail-5 */
+
+  --tt-white: #ffffff;
+
+  --border-thick: 4px;
+  --border-thin: 2px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --shadow-soft: 0 4px 0 rgba(35, 24, 24, 0.15);
+}
+
+/* 简单 reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  color: var(--tt-ink);
+  background: var(--tt-bg);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+input,
+button,
+textarea {
+  border-radius: 0;
+}
+
+/* 让整个页面感觉像被黑线分割成块 */
+
+main,
+section,
+header,
+footer {
+  border: var(--border-thin) solid var(--tt-ink);
+}
+
+/* =========================
+   1. Layout helpers
+   ========================= */
+
+main {
+  max-width: 1120px;
+  margin: 0 auto 3rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-soft);
+}
+
+@media (max-width: 768px) {
+  main {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+}
+
+/* Scroll-snap for Home 三页式 */
+
+body {
+  scroll-behavior: smooth;
+}
+
+.home {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--tt-bg);
+  box-shadow: none;
+}
+
+.home .snap {
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home {
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+}
+
+/* =========================
+   2. Typography & generic UI
+   ========================= */
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+p {
+  margin: 0.25rem 0 0.75rem;
+  line-height: 1.6;
+}
+
+/* “牌子”感的卡片：粗黑线 + 色块底 */
+
+.pop-card {
+  position: relative;
+  border: var(--border-thick) solid var(--tt-ink);
+  background: var(--tt-white);
+  padding: 2rem;
+  box-shadow: 0 0 0 4px var(--tt-ink);
+}
+
+@media (max-width: 768px) {
+  .pop-card {
+    padding: 1.5rem;
+  }
+}
+
+/* 通用按钮 */
+
+.btn-pop,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: 999px;
+  border: var(--border-thick) solid var(--tt-ink);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease,
+    background-color 0.1s ease, color 0.1s ease;
+  background: var(--tt-yellow);
+  color: var(--tt-ink);
+  box-shadow: 0 3px 0 rgba(35, 24, 24, 0.2);
+}
+
+.btn-ghost {
+  background: var(--tt-white);
+}
+
+.btn-pop:hover,
+.btn-ghost:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 rgba(35, 24, 24, 0.25);
+}
+
+.btn-pop:active,
+.btn-ghost:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 0 rgba(35, 24, 24, 0.3);
+}
+
+.btn-pop.sm,
+.btn-ghost.sm {
+  padding: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+}
+
+.btn-pop:disabled,
+.btn-ghost:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 小圆角 badge */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: var(--border-thin) solid var(--tt-ink);
+  background: var(--tt-orange);
+  font-weight: 700;
+}
+
+/* 小圆点分隔符（复用） */
+
+.dot,
+.job-card__dot,
+.job-detail__dot {
+  display: inline-block;
+  margin: 0 0.35rem;
+}
+
+/* =========================
+   3. Navbar
+   ========================= */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--tt-bg);
+  border-bottom: var(--border-thick) solid var(--tt-ink);
+}
+
+.navbar__inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0.4rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.brand {
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border: var(--border-thick) solid var(--tt-ink);
+  background: var(--tt-orange);
+}
+
+.navbar nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-link {
+  padding: 0.3rem 0.6rem;
+  border-bottom: 3px solid transparent;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.09em;
+}
+
+.nav-link.active {
+  border-color: var(--tt-ink);
+}
+
+.nav-avatar-btn {
+  border-radius: 999px;
+  border: var(--border-thin) solid var(--tt-ink);
+  background: var(--tt-white);
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.nav-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: var(--tt-brown);
+  color: var(--tt-bg);
+}
+
+@media (max-width: 720px) {
+  .navbar__inner {
+    padding-inline: 0.75rem;
+  }
+
+  .navbar nav {
+    gap: 0.4rem;
+  }
+
+  .nav-link {
+    display: none;
+  }
+
+  .nav-link.active {
+    display: inline-block;
+  }
+}
+
+/* =========================
+   4. Home (Hero + Features)
+   ========================= */
+
+.hero {
+  background: var(--tt-bg);
+  position: relative;
+}
+
+.hero__content {
+  max-width: 640px;
+}
+
+.hero__title {
+  font-size: clamp(2.4rem, 4vw, 3rem);
+  text-transform: uppercase;
+}
+
+.hero__subtitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.hero__cta {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* 背景几何图形 */
+
+.hero__pattern,
+.confetti,
+.squares {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+      to right,
+      rgba(35, 24, 24, 0.55) 0,
+      rgba(35, 24, 24, 0.55) 4px,
+      transparent 4px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(35, 24, 24, 0.55) 0,
+      rgba(35, 24, 24, 0.55) 4px,
+      transparent 4px
+    );
+  background-size: 120px 120px;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+}
+
+.confetti {
+  background-color: var(--tt-yellow);
+  opacity: 0.25;
+}
+
+.squares {
+  background-color: var(--tt-orange);
+  opacity: 0.18;
+}
+
+/* Features */
+
+.features {
+  background: var(--tt-white);
+}
+
+.features.alt {
+  background: var(--tt-bg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
+  gap: 2rem;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+
+.feature-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.feature-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem 1rem;
+  align-items: flex-start;
+}
+
+.section-cta {
+  margin-top: 1.5rem;
+}
+
+/* 三张卡片 */
+
+.cards {
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  border: var(--border-thick) solid var(--tt-ink);
+  padding: 1rem;
+  background: linear-gradient(
+      to right,
+      var(--tt-yellow) 0 18%,
+      transparent 18% 100%
+    ),
+    var(--tt-white);
+}
+
+/* 响应式 */
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* =========================
+   5. Forms & Inputs
+   ========================= */
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  border-radius: 0;
+  border: var(--border-thin) solid var(--tt-ink);
+  background: var(--tt-white);
+  font: inherit;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+fieldset {
+  border: var(--border-thin) solid var(--tt-ink);
+  padding: 0.75rem 1rem;
+}
+
+/* =========================
+   6. Auth pages
+   ========================= */
+
+.auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 60px);
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 460px;
+  border: var(--border-thick) solid var(--tt-ink);
+  background: var(--tt-white);
+  padding: 2rem;
+  box-shadow: 0 0 0 3px var(--tt-ink);
+}
+
+.auth__title {
+  margin-bottom: 1rem;
+}
+
+.auth__error {
+  border: var(--border-thin) solid var(--tt-ink);
+  background: rgba(191, 110, 65, 0.1);
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.auth__form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.auth__hint {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+
+.auth__role-group {
+  margin-bottom: 0.5rem;
+}
+
+.auth__role-option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.auth__role-option--disabled {
+  opacity: 0.4;
+}
+
+/* =========================
+   7. Job list & JobCard
+   ========================= */
+
+.jobs-page__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-bottom: var(--border-thick) solid var(--tt-ink);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.jobs-page__hint {
+  font-size: 0.85rem;
+  padding: 0.2rem 0.5rem;
+  border-left: var(--border-thick) solid var(--tt-ink);
+  background: var(--tt-yellow);
+}
+
+.jobs-page__create,
+.jobs-page__manage {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: var(--border-thick) solid var(--tt-ink);
+}
+
+.jobs-page__form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.jobs-page__form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.jobs-page__error {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.7rem;
+  background: rgba(191, 110, 65, 0.1);
+  border: var(--border-thin) solid var(--tt-brown);
+}
+
+.jobs-page__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+}
+
+.jobs-page__table th,
+.jobs-page__table td {
+  border: var(--border-thin) solid var(--tt-ink);
+  padding: 0.4rem 0.5rem;
+  font-size: 0.88rem;
+}
+
+.jobs-page__empty {
+  margin-top: 1.5rem;
+  font-style: italic;
+}
+
+/* Job list grid */
+
+.jobs {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+/* JobCard */
+
+.job-card {
+  border: var(--border-thick) solid var(--tt-ink);
+  padding: 1rem;
+  background: linear-gradient(
+      to bottom,
+      var(--tt-yellow) 0 18%,
+      transparent 18% 100%
+    ),
+    var(--tt-white);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.job-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(35, 24, 24, 0.25);
+}
+
+.job-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.job-card__title {
+  font-size: 1.05rem;
+}
+
+.job-card__badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border: var(--border-thin) solid var(--tt-ink);
+  background: var(--tt-orange);
+}
+
+.job-card__meta {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.job-card__desc {
+  font-size: 0.85rem;
+}
+
+.job-card__actions {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.job-card__link,
+.job-card__btn {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  border: var(--border-thin) solid var(--tt-ink);
+  background: var(--tt-brown);
+  color: var(--tt-bg);
+}
+
+.job-card__btn[disabled] {
+  background: #ddd;
+  color: #555;
+}
+
+/* =========================
+   8. Job Detail
+   ========================= */
+
+.job-detail {
+  max-width: 720px;
+}
+
+.job-detail__back {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 0.8rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.job-detail__title {
+  font-size: 1.8rem;
+}
+
+.job-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.job-detail__content {
+  border-top: var(--border-thin) solid var(--tt-ink);
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  white-space: pre-line;
+}
+
+.job-detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.job-detail__link {
+  @extend .btn-pop;
+}
+
+.job-detail__btn {
+  border: var(--border-thick) solid var(--tt-ink);
+  padding: 0.45rem 1rem;
+  background: var(--tt-white);
+}
+
+.job-detail__btn.primary {
+  background: var(--tt-orange);
+}
+
+.job-detail__error,
+.job-detail__success {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
+  border: var(--border-thin) solid var(--tt-ink);
+}
+
+.job-detail__error {
+  background: rgba(191, 110, 65, 0.1);
+}
+
+.job-detail__success {
+  background: rgba(242, 212, 61, 0.15);
+}
+
+/* =========================
+   9. Dashboards (HR / Lead)
+   ========================= */
+
+.dash {
+  min-height: calc(100vh - 80px);
+}
+
+.dash__title {
+  margin-bottom: 1rem;
+  border-bottom: var(--border-thick) solid var(--tt-ink);
+  padding-bottom: 0.5rem;
+}
+
+.dash__error {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.7rem;
+  background: rgba(191, 110, 65, 0.1);
+  border: var(--border-thin) solid var(--tt-brown);
+}
+
+.dash__empty {
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+.dash__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+}
+
+.dash__table th,
+.dash__table td {
+  border: var(--border-thin) solid var(--tt-ink);
+  padding: 0.4rem 0.5rem;
+  font-size: 0.88rem;
+  vertical-align: middle;
+}
+
+.table-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: var(--border-thin) solid var(--tt-ink);
+}
+
+.table-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tt-brown);
+  color: var(--tt-bg);
+  font-size: 0.9rem;
+}
+
+/* =========================
+   10. Candidate Profile
+   ========================= */
+
+.profile__title {
+  margin-bottom: 1rem;
+  border-bottom: var(--border-thick) solid var(--tt-ink);
+  padding-bottom: 0.5rem;
+}
+
+.profile__card {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: var(--border-thick) solid var(--tt-ink);
+  background: var(--tt-white);
+}
+
+.profile__user {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.profile__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: var(--border-thick) solid var(--tt-ink);
+}
+
+.profile__avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tt-brown);
+  color: var(--tt-bg);
+  font-weight: 700;
+}
+
+.profile__user-info p {
+  margin: 0.15rem 0;
+}
+
+.profile__error {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(191, 110, 65, 0.1);
+  border: var(--border-thin) solid var(--tt-brown);
+}
+
+.profile__empty {
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+.profile__list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.profile__item {
+  border: var(--border-thin) solid var(--tt-ink);
+  padding: 0.6rem 0.7rem;
+}
+
+.profile__item-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.profile__job-title {
+  font-weight: 600;
+}
+
+.profile__job-meta {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.profile__status {
+  font-size: 0.85rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  border: var(--border-thin) solid var(--tt-ink);
+  background: var(--tt-yellow);
+}
+
+.profile__item-sub {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* =========================
+   11. Misc
+   ========================= */
+
+.jobs-page,
+.auth,
+.dash,
+.profile,
+.job-detail {
+  background: var(--tt-bg);
+}
+
+.jobs-page > *,
+.auth > *,
+.dash > *,
+.profile > *,
+.job-detail > * {
+  background: transparent;
+}
+
+/* 全局 loading/error 文案 */
+
+body .loading,
+body .error {
+  padding: 1rem;
+}
+
+/* 404 */
+
+main > div:only-child {
+  text-align: center;
+}
+
+/* 小屏优化 */
+
+@media (max-width: 768px) {
+  .jobs-page__form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dash__table,
+  .jobs-page__table {
+    font-size: 0.8rem;
+  }
+}
+
+
+
+
 .home .features .grid,
 .home .features.alt .grid {
   display: block;
